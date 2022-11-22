@@ -1,0 +1,5 @@
+[
+    {"Actual":false,"BlockNumber":0,"DepartureText":"5:17","OtherKey":"\/Date(1669072620000-0600)\/","Description":"to Mall of America","Gate":"2","Route":"Blue","RouteDirection":"SB","Terminal":null,"VehicleHeading":0,"VehicleLatitude":0,"VehicleLongitude":0},
+    {"Actual":false,"BlockNumber":0,"DepartureText":"5:32","Description":"to Mall of America","Gate":"2","Route":"Blue","RouteDirection":"SB","Terminal":null,"VehicleHeading":0,"VehicleLatitude":0,"VehicleLongitude":0},
+    {"Actual":false,"BlockNumber":0,"DepartureText":"5:47","DepartureTime":"2022-11-22T15:50-06:00","Description":"to Mall of America","Gate":"2","Route":"Blue","RouteDirection":"SB","Terminal":null,"VehicleHeading":0,"VehicleLatitude":0,"VehicleLongitude":0}
+]
