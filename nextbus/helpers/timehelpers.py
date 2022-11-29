@@ -35,11 +35,11 @@ def _parse_timestring(timestring: str) -> Union[Tuple[datetime.datetime, datetim
     Created timezone object
 
     """
-    time = str(timestring).strip(
+    stripped_time = str(timestring).strip(
         "/").replace('Date', '').lstrip("(").rstrip(")")
     try:
         timestamp, sign, hours, minutes = re.match(
-            '(\\d+)([+\\-]?)(\\d{2})(\\d{2})', time).groups()
+            '(\\d+)([+\\-]?)(\\d{2})(\\d{2})', stripped_time).groups()
     except AttributeError:
         return None, None
     sign = -1 if sign == '-' else 1
@@ -69,8 +69,8 @@ def _delta_time_from_now(date: datetime.datetime, timezone=None) -> datetime.tim
 
     datetime.timedelta object
 
-
     """
+
     if date is None:
         return None
 
@@ -78,7 +78,29 @@ def _delta_time_from_now(date: datetime.datetime, timezone=None) -> datetime.tim
     return delta_time
 
 
-def get_time_to_next_departure(next_departure: dict) -> Union[str, None]:
+def v2_get_time_to_next_departure(next_departure: dict):
+    try:
+        departure_timestamp = next_departure["departure_time"]
+
+        departure_datetime = datetime.datetime.fromtimestamp(int(departure_timestamp))
+
+        delta_time = _delta_time_from_now(departure_datetime)
+
+        if isinstance(delta_time, datetime.timedelta):
+
+            return f"{delta_time.seconds / 60:.0f} minutes {delta_time.seconds % 60} seconds"
+
+    except KeyError as exc:
+        error_message = "Departure data has no 'departure_time' key"
+        raise KeyError(error_message) from exc
+    
+    except ValueError as exc:
+        error_message = f"Departure data timestamp has a value of '{departure_timestamp}' and is of {type(departure_timestamp)}, but must be an integer or castable to an integer."
+        raise ValueError(error_message) from exc
+
+
+
+def v1_get_time_to_next_departure(next_departure: dict) -> Union[str, None]:
     """
     Keyword arguments:
     next_departure      --      data dictionary containing one departure entry retrieved from the API

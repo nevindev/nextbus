@@ -24,7 +24,7 @@ def _create_argparser():
                            required=True)
 
     argparser.add_argument('-d', '--direction',
-                           choices=['south', 'east', 'west', 'north'],
+                           choices=['north', 'south', 'east', 'west'],
                            help="Cardinal direction the bus travels on the route",
                            required=True)
 

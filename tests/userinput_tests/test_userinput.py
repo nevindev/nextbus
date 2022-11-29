@@ -17,10 +17,10 @@ def test_get_user_inputs_with_valid_input_returns_values():
 
 
 def test_get_user_inputs_with_invalid_input_exits():
-    with pytest.raises(SystemExit) as e:
+    with pytest.raises(SystemExit):
         userinput.get_user_input(args=invalid_args)
 
 
 def test_get_user_inputs_with_missing_input_exits():
-    with pytest.raises(SystemExit) as e:
+    with pytest.raises(SystemExit):
         userinput.get_user_input(args=missing_args)
