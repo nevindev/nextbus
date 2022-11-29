@@ -1,67 +1,78 @@
 import json
 import requests
-from typing import Union
+
+API = "https://svc.metrotransit.org/nextripv2"
+
+def _get_data_from_api(api_endpoint):
+    api_url = f"{API}{api_endpoint}"
+    try:
+        response = requests.get(url=api_url, timeout=10)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        raise requests.exceptions.HTTPError(err) from err
+    
+    except requests.exceptions.ConnectionError as err:
+        raise requests.exceptions.ConnectionError(err) from err
+
+    try: 
+        data = json.loads(response.content)
+    except ValueError as err:
+        raise ValueError(err) from err
+    
+    return data
 
 
-def _get_data_from_api(api_endpoint) -> Union[list, None]:
-    api_url = f"https://svc.metrotransit.org{api_endpoint}"
-    response = requests.get(url=api_url, timeout=10)
-    if response.status_code != 200:
-        return None
-    return json.loads(response.content)
-
-
-def get_routes() -> Union[list, None]:
+def get_routes() -> list:
     route_data = _get_data_from_api(
-        api_endpoint="/NexTrip/Routes?format=json")
-
+        api_endpoint="/routes")
     return route_data
 
 
-def get_stops_for_route_and_direction(route: str, direction: int) -> Union[list, None]:
+def get_directions_for_route(route_id) -> list:
+    direction_data = _get_data_from_api(api_endpoint=f"/directions/{route_id}")
+    return direction_data
+
+
+def get_stops_for_route_and_direction(route_id: str, direction_id: int) -> list:
     stops_data = _get_data_from_api(
-        api_endpoint=f"/NexTrip/Stops/{route}/{direction}?format=json")
-
-    if stops_data is None:
-        return None
-
+        api_endpoint=f"/stops/{route_id}/{direction_id}")
     return stops_data
 
 
-def get_next_departure(route: str, direction: int, stop: str) -> Union[dict, None]:
+def get_departures(route_id: str, direction_id: int, place_code: str) -> list:
     """Requests the bus stop times for a given route, direction and stop.
 
     Keyword arguments:
 
-    route       --      the Route value of the bus corresponding
-                        to the metrotranist API /NexTrip/Routes endpoint
+    route_id       --   the route value of the bus corresponding
+                        to the metrotranist API /nextripv2/routes endpoint
 
-    direction   --      a Direction integer corresponding to a cardinal
-                        direction (1: south, 2: east, 3: west, 4: north)
+    direction_id   --   a direction integer corresponding to a valid cardinal
+                        direction the route travels (north and south or east and west)
 
-    stop        --      the Value value of a stop on the given route
+    place_code     --   the place_code value of a stop on the given route
                         corresponding to the metrotransit API 
-                        /NexTrip/Stops/{Route}/{Direction}
+                        /nextripv2/stops/{route_id}/{direction_id}
 
     Data:
-    List of objects containing the DepartureTime, Description, Route, RouteDirection etc.
-    The list is ordered chronologically by arrival time, soonest first.
+
+    Dictionary of objects containing the stops, alerts and departures for the 
+    given route_id, direction_id and place_code.
+    The list of departures is ordered chronologically by arrival time, soonest first.
 
     Logic:
-    Requests the list of buses given the route, direction and stop from the API
 
-    If the response is :ok, gets the first bus from the list of buses, which is the next arrival.
+    Requests the list of buses given the route_id, direction_id and place_code from the API
+
+    If the response is :ok, gets the list of departures.
 
     Returns:
-    -None if the API request returns None or an empty dataset
 
-    -dictionary of the first entry that is returned from the API response.
+    -   List of departures that are returned from the API response.
+    
+    -   Empty List if API response has no "departures" key.
     """
-    departure_data = _get_data_from_api(
-        api_endpoint=f"/NexTrip/{route}/{direction}/{stop}?format=json")
 
-    if departure_data is not None and len(departure_data) >= 1:
-        next_departure = departure_data[0]
-        return next_departure
-
-    return None
+    departures = _get_data_from_api(
+        api_endpoint=f"/{route_id}/{direction_id}/{place_code}")
+    return departures.get("departures", [])

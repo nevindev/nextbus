@@ -29,6 +29,7 @@ def test_parse_timestring_with_invalid_input_returns_none():
     assert empty_date is None
     assert empty_timezone is None
 
+
 def test_delta_time_from_now_with_valid_datetimes_returns_timedelta():
     delta_time = timehelpers._delta_time_from_now(
         date=VALID_DATETIME, timezone=None)

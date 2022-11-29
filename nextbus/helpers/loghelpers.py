@@ -2,15 +2,13 @@ import logging
 import time
 
 
-# def init_logger():
-
 logging.basicConfig(
     format='%(asctime)s %(levelname)s %(message)s',
     filename="nextbus.log",
     encoding="utf-8",
     level=logging.INFO)
+    
 logger = logging.getLogger('')
-    # return logger
 
 
 def log_success(start_time: int, message=""):
